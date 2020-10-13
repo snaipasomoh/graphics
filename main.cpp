@@ -58,11 +58,48 @@ int main (int argc, char **argv){
 	glfwSetKeyCallback(window, key_callback);
 
 	GLfloat vertices[] = {
-		 0.5,  0.5, 0.0,	1.0, 0.0, 0.0,	1.0, 1.0,
-		 0.5, -0.5, 0.0,	0.0, 1.0, 0.0,	1.0, 0.0,
-		-0.5, -0.5, 0.0,	0.0, 0.0, 1.0,	0.0, 0.0,
-		-0.5,  0.5, 0.0,	1.0, 1.0, 0.0,	0.0, 1.0
-	};
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
 
 	GLuint indices[] = {
 		0, 1, 3,
@@ -126,13 +163,13 @@ int main (int argc, char **argv){
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GL_FLOAT), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GL_FLOAT), 0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GL_FLOAT), (GLvoid *)(3*sizeof(GL_FLOAT)));
-	glEnableVertexAttribArray(1);
+	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GL_FLOAT), (GLvoid *)(3*sizeof(GL_FLOAT)));
+	// glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GL_FLOAT), (GLvoid *)(6*sizeof(GL_FLOAT)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GL_FLOAT), (GLvoid *)(3*sizeof(GL_FLOAT)));
 	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -140,11 +177,12 @@ int main (int argc, char **argv){
 
 	glBindVertexArray(0);
 
+	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		glClearColor(0.2, 0.3, 0.3, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -156,7 +194,7 @@ int main (int argc, char **argv){
 		
 
 		glm::mat4 model(1.0);
-		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		glm::mat4 view(1.0);
 		view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
@@ -175,7 +213,7 @@ int main (int argc, char **argv){
 
 		
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glBindVertexArray(0);
 
