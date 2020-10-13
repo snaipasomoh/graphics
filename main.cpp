@@ -8,25 +8,25 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "shader.hpp"
 
-float ANGLE = 0;
+// float ANGLE = 0;
 
 void key_callback (GLFWwindow *window, int key, int scancode, int action,
                                                                       int mode){
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT){
-		ANGLE += 2;
-		if (ANGLE >= 360){
-			ANGLE -= 360;
-		}
-	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT){
-		ANGLE -= 2;
-		if (ANGLE <= 0){
-			ANGLE += 360;
-		}
-	}
+	// else if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT){
+	// 	ANGLE += 2;
+	// 	if (ANGLE >= 360){
+	// 		ANGLE -= 360;
+	// 	}
+	// }
+	// else if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT){
+	// 	ANGLE -= 2;
+	// 	if (ANGLE <= 0){
+	// 		ANGLE += 360;
+	// 	}
+	// }
 }
 
 int main (int argc, char **argv){
@@ -155,11 +155,21 @@ int main (int argc, char **argv){
 
 		
 
-		glm::mat4 transform(1.0);
-		transform = glm::rotate(transform, glm::radians(ANGLE), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 model(1.0);
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "transform"), 1,
-		                   GL_FALSE, glm::value_ptr(transform));
+		glm::mat4 view(1.0);
+		view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
+
+		glm::mat4 projection(1.0);
+		projection = glm::perspective(45.0f, (float)width/height, 0.1f, 100.0f);
+
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1,
+		                   GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1,
+		                   GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1,
+		                   GL_FALSE, glm::value_ptr(projection));
 
 		shader.Use();
 
