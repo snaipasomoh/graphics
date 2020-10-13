@@ -3,15 +3,31 @@
 #include <iostream>
 #include <cmath>
 #include <SOIL/SOIL.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "shader.hpp"
+
+float ANGLE = 0;
 
 void key_callback (GLFWwindow *window, int key, int scancode, int action,
                                                                       int mode){
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+	else if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT){
+		ANGLE += 2;
+		if (ANGLE >= 360){
+			ANGLE -= 360;
+		}
+	}
+	else if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT){
+		ANGLE -= 2;
+		if (ANGLE <= 0){
+			ANGLE += 360;
+		}
+	}
 }
-
 
 int main (int argc, char **argv){
 	glfwInit();
@@ -19,7 +35,7 @@ int main (int argc, char **argv){
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
-	GLFWwindow *window = glfwCreateWindow(1920, 1080, "Fuck", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(2000, 2000, "Fuck", nullptr, nullptr);
 	if (window == nullptr){
 		
 		std::cout << glfwGetError(NULL) << std::endl;
@@ -125,8 +141,6 @@ int main (int argc, char **argv){
 	glBindVertexArray(0);
 
 
-
-
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		glClearColor(0.2, 0.3, 0.3, 1);
@@ -139,13 +153,25 @@ int main (int argc, char **argv){
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture2"), 1);
 
+		
+
+		glm::mat4 transform(1.0);
+		transform = glm::rotate(transform, glm::radians(ANGLE), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "transform"), 1,
+		                   GL_FALSE, glm::value_ptr(transform));
+
 		shader.Use();
+
+		
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
+
+		
 	}
 
 	glDeleteBuffers(1, &VBO);
