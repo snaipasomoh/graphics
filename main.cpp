@@ -7,26 +7,58 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "shader.hpp"
+#include "camera.hpp"
 
-// float ANGLE = 0;
+Camera camera(glm::vec3(0.0, 0.0, 3.0));
+bool keys[1024];
+
+GLfloat deltaTime = 0.0;
+GLfloat lastFrame = 0.0;
+
+
+GLfloat yaw = -90.0f;
+GLfloat pitch = 0.0f;
+
+GLfloat fov = 45.0;
 
 void key_callback (GLFWwindow *window, int key, int scancode, int action,
                                                                       int mode){
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-	// else if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT){
-	// 	ANGLE += 2;
-	// 	if (ANGLE >= 360){
-	// 		ANGLE -= 360;
-	// 	}
-	// }
-	// else if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT){
-	// 	ANGLE -= 2;
-	// 	if (ANGLE <= 0){
-	// 		ANGLE += 360;
-	// 	}
-	// }
+	if (action == GLFW_PRESS){
+		keys[key] = true;
+	}
+	if (action == GLFW_RELEASE){
+		keys[key] = false;
+	}
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+
+	static GLfloat lastX = xpos, lastY = ypos;
+
+	GLfloat xoffset = xpos - lastX;
+	GLfloat yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+	camera.ProcessMouseScroll(yoffset);
+}
+
+void do_movement (){
+	if(keys[GLFW_KEY_W])
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if(keys[GLFW_KEY_S])
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if(keys[GLFW_KEY_A])
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if(keys[GLFW_KEY_D])
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 int main (int argc, char **argv){
@@ -56,6 +88,8 @@ int main (int argc, char **argv){
 	glViewport(0, 0, width, height);
 
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	GLfloat vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -192,8 +226,13 @@ int main (int argc, char **argv){
 
 	glEnable(GL_DEPTH_TEST);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+
+
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();
+		do_movement();
 		glClearColor(0.2, 0.3, 0.3, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -207,12 +246,10 @@ int main (int argc, char **argv){
 		
 
 		
-
-		glm::mat4 view(1.0);
-		view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
+		glm::mat4 view = camera.GetViewMatrix();
 
 		glm::mat4 projection(1.0);
-		projection = glm::perspective(45.0f, (float)width/height, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Zoom), (float)width/height, 0.1f, 100.0f);
 
 		GLuint modelLoc = glGetUniformLocation(shader.Program, "model");
 
@@ -240,7 +277,9 @@ int main (int argc, char **argv){
 
 		glfwSwapBuffers(window);
 
-		
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 	}
 
 	glDeleteBuffers(1, &VBO);
