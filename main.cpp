@@ -273,7 +273,8 @@ int main (int argc, char **argv){
 		// GLint objectColorLoc = glGetUniformLocation(shader.Program, "objectColor");
 
 		// glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
-		shader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+		// shader.setVec3("light.position", lightPos.x, lightPos.y, lightPos.z);
+		shader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
 		shader.setVec3("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 		shader.setVec3("material.ambient", 1.0, 0.5, 0.31);
 		shader.setInt("material.diffuse", 0);
@@ -311,28 +312,33 @@ int main (int argc, char **argv){
 		shader.setMat4("projection", projection);
 		
 		glBindVertexArray(VAO);
-		glm::mat4 model(1.0);
-		model = glm::translate(model, cubePositions[0]);
-		shader.setMat4("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for(unsigned int i = 0; i < 10; i++){
+			glm::mat4 model(1.);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			shader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 
 		glBindVertexArray(0);
 
-		lampShader.use();
-		lampShader.setVec3("lightColor", lightColor);
+		// lampShader.use();
+		// lampShader.setVec3("lightColor", lightColor);
 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
+		// glm::mat4 model(1.0);
+		// model = glm::translate(model, lightPos);
+		// model = glm::scale(model, glm::vec3(0.2f));
 
-		lampShader.setMat4("model", model);
-		lampShader.setMat4("view", view);
-		lampShader.setMat4("projection", projection);
+		// lampShader.setMat4("model", model);
+		// lampShader.setMat4("view", view);
+		// lampShader.setMat4("projection", projection);
 		
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
+		// glBindVertexArray(lightVAO);
+		// glDrawArrays(GL_TRIANGLES, 0, 36);
+		// glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
 
