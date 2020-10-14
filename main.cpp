@@ -19,7 +19,7 @@ GLfloat lastFrame = 0.0;
 GLfloat yaw = -90.0f;
 GLfloat pitch = 0.0f;
 
-GLfloat fov = 45.0;
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 void key_callback (GLFWwindow *window, int key, int scancode, int action,
                                                                       int mode){
@@ -196,7 +196,8 @@ int main (int argc, char **argv){
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	Shader shader("shader.vert", "shader.frag");
+	Shader shader("lightShader.vert", "lightShader.frag");
+	Shader lampShader("lampShader.vert", "lampShader.frag");
 	
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
@@ -224,6 +225,14 @@ int main (int argc, char **argv){
 
 	glBindVertexArray(0);
 
+	GLuint lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GL_FLOAT), 0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+
 	glEnable(GL_DEPTH_TEST);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -236,16 +245,23 @@ int main (int argc, char **argv){
 		glClearColor(0.2, 0.3, 0.3, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture1"), 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture2"), 1);
+		shader.Use();
 
-		
+		GLint objectColorLoc = glGetUniformLocation(shader.Program, "objectColor");
+		GLint lightColorLoc  = glGetUniformLocation(shader.Program, "lightColor");
+		glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
+		glUniform3f(lightColorLoc,  1.0f, 1.0f, 1.0f);
 
-		
+		// shader.Use();
+
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, texture);
+		// glUniform1i(glGetUniformLocation(shader.Program, "ourTexture1"), 0);
+		// glActiveTexture(GL_TEXTURE1);
+		// glBindTexture(GL_TEXTURE_2D, texture2);
+		// glUniform1i(glGetUniformLocation(shader.Program, "ourTexture2"), 1);
+
+
 		glm::mat4 view = camera.GetViewMatrix();
 
 		glm::mat4 projection(1.0);
@@ -258,21 +274,34 @@ int main (int argc, char **argv){
 		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1,
 		                   GL_FALSE, glm::value_ptr(projection));
 
-		shader.Use();
 
 		
 		glBindVertexArray(VAO);
-		for (GLuint i = 0; i < 10; i++){
-			glm::mat4 model(1.0);
-			model = glm::translate(model, cubePositions[i]);
-			GLfloat angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle) * (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glm::mat4 model(1.0);
+		model = glm::translate(model, cubePositions[0]);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
 		
 
+		glBindVertexArray(0);
+
+		lampShader.Use();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+
+		modelLoc = glGetUniformLocation(lampShader.Program, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		glUniformMatrix4fv(glGetUniformLocation(lampShader.Program, "view"), 1,
+		                   GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(lampShader.Program, "projection"), 1,
+		                   GL_FALSE, glm::value_ptr(projection));
+		
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
