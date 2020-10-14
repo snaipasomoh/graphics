@@ -14,6 +14,10 @@ class Shader{
 	Shader (GLchar const *vertexPath, GLchar const *fragmentPath);
 
 	void Use ();
+
+	void SetVec3 (GLchar const *arg, GLfloat x, GLfloat y, GLfloat z);
+
+	void SetFloat (GLchar const *arg, GLfloat x);
 };
 
 Shader::Shader (GLchar const *vertexPath, GLchar const *fragmentPath){
@@ -87,6 +91,14 @@ Shader::Shader (GLchar const *vertexPath, GLchar const *fragmentPath){
 
 void Shader::Use (){
 	glUseProgram(this->Program);
+}
+
+void Shader::SetVec3 (GLchar const *arg, GLfloat x, GLfloat y, GLfloat z){
+	glUniform3f(glGetUniformLocation(this->Program, arg), x, y, z);
+}
+
+void Shader::SetFloat (GLchar const *arg, GLfloat x){
+	glUniform1f(glGetUniformLocation(this->Program, arg), x);
 }
 
 #endif
