@@ -191,9 +191,9 @@ int main (int argc, char **argv){
 
 	glm::vec3 lightTarget(0.0, 0.0, 0.0);
 
-	GLfloat radA = 5.0;
-	GLfloat radB = 5.0;
-	GLfloat spd = 2.0;
+	GLfloat radA = 10.0;
+	GLfloat radB = 10.0;
+	GLfloat spd = 10.0;
 
 	ncStart = planeNorm * 20.0f / sqrtf(3.0f);
 
@@ -204,8 +204,8 @@ int main (int argc, char **argv){
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
 
-	GLfloat viewRad = 10.0;
-	GLfloat viewSpd = 1.0;
+	GLfloat viewRad = 30.0;
+	GLfloat viewSpd = 2.0;
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -216,7 +216,7 @@ int main (int argc, char **argv){
 		GLfloat x = sin(glfwGetTime() * spd) * radA;
 		GLfloat y = cos(glfwGetTime() * spd) * radB;
 		glm::vec3 lightPos = trans * glm::vec3(x, y, 0) + ncStart;
-		glm::vec3 lightDir = glm::normalize(lightTarget - lightPos);
+		// glm::vec3 lightDir = glm::normalize(lightTarget - lightPos);
 		// std::cout << -lightPos.x - lightPos.y + lightPos.z - 20 << std::endl;
 		// std::cout << lightPos.x << " " << lightPos.y << " " << lightPos.z << " " << std::endl;
 
@@ -225,6 +225,8 @@ int main (int argc, char **argv){
 		view = glm::lookAt(glm::vec3(vx, 0.0, vz), //camPos
 	                             glm::vec3(0.0, 0.0, 0.0), //camTargetPos
 	                             glm::vec3(0.0, 1.0, 0.0)); //camUpVec
+		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
+		glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(0.0, 0.0, 10.0));
 
 		shader.use();
 		shader.setMat4("model", model);

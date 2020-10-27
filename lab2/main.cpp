@@ -155,8 +155,8 @@ int main (int argc, char **argv){
 	glm::vec3 lightTarget(0.0, 0.0, 0.0);
 
 	GLfloat radA = 5.0;
-	GLfloat radB = 5.0;
-	GLfloat spd = 30.0;
+	GLfloat radB = 10.0;
+	GLfloat spd = 5.0;
 
 	ncStart = planeNorm * 20.0f / sqrtf(3.0f);
 
