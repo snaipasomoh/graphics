@@ -57,7 +57,7 @@ int main (int argc, char **argv){
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
-	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Lab3",
+	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Lab4",
 	                                      nullptr, nullptr);
 	if (window == nullptr){
 		std::cout << glfwGetError(NULL) << std::endl;
@@ -118,8 +118,8 @@ int main (int argc, char **argv){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int tWidth, tHeight;
-	unsigned char *image = SOIL_load_image("awesomeface.png", &tWidth, &tHeight, 0,
-	                                       SOIL_LOAD_RGB);
+	unsigned char *image = SOIL_load_image("awesomeface.png", &tWidth, &tHeight,
+	                                       0, SOIL_LOAD_RGB);
 
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tWidth, tHeight, 0, GL_RGB,
@@ -203,6 +203,8 @@ int main (int argc, char **argv){
 	                             glm::vec3(0.0, 1.0, 0.0)); //camUpVec*/
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
+	
+	glm::mat4 model2 = glm::translate(model, glm::vec3(2.0, 0.0, -2.0));
 
 	GLfloat viewRad = 30.0;
 	GLfloat viewSpd = 2.0;
@@ -225,8 +227,8 @@ int main (int argc, char **argv){
 		view = glm::lookAt(glm::vec3(vx, 0.0, vz), //camPos
 	                             glm::vec3(0.0, 0.0, 0.0), //camTargetPos
 	                             glm::vec3(0.0, 1.0, 0.0)); //camUpVec
-		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
-		glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(0.0, 0.0, 10.0));
+		glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
+		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(0.0, 0.0, 10.0));
 
 		shader.use();
 		shader.setMat4("model", model);
@@ -241,6 +243,9 @@ int main (int argc, char **argv){
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, indLen);
 		// glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+
+		shader.setMat4("model", model2);
+		glDrawArrays(GL_TRIANGLES, 0, indLen);
 		glBindVertexArray(0);
 
 		glm::mat4 lampModel(1.0);
