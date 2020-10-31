@@ -9,9 +9,60 @@
 #include <filesystem>
 #include "shader.hpp"
 #include "model.hpp"
+#include "camera.hpp"
 
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
+
+Camera camera(glm::vec3(0.0, 0.0, 3.0));
+bool keys[1024];
+
+GLfloat deltaTime = 0.0;
+GLfloat lastFrame = 0.0;
+
+
+GLfloat yaw = -90.0f;
+GLfloat pitch = 0.0f;
+
+void key_callback (GLFWwindow *window, int key, int scancode, int action,
+                                                                      int mode){
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	if (action == GLFW_PRESS){
+		keys[key] = true;
+	}
+	if (action == GLFW_RELEASE){
+		keys[key] = false;
+	}
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+
+	static GLfloat lastX = xpos, lastY = ypos;
+
+	GLfloat xoffset = xpos - lastX;
+	GLfloat yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+	camera.ProcessMouseScroll(yoffset);
+}
+
+void do_movement (){
+	if(keys[GLFW_KEY_W])
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if(keys[GLFW_KEY_S])
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if(keys[GLFW_KEY_A])
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if(keys[GLFW_KEY_D])
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+}
 
 int main (int argc, char **argv){
 	glfwInit();
@@ -38,6 +89,9 @@ int main (int argc, char **argv){
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 	// stbi_set_flip_vertically_on_load(true);
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	Shader shader("shader.vert", "shader.frag");
 
@@ -47,28 +101,34 @@ int main (int argc, char **argv){
 	glm::mat4 view;/* = glm::lookAt(planeNorm * 40.0f, //camPos
 	                             glm::vec3(0.0, 0.0, 0.0), //camTargetPos
 	                             glm::vec3(0.0, 1.0, 0.0)); //camUpVec*/
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
 	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
 
 	GLfloat viewRad = 10.0;
 	GLfloat viewSpd = 2.0;
 
-	Model obj(std::filesystem::absolute("eyeball.obj"));
+	Model obj(std::filesystem::absolute("octo.obj"));
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		do_movement();
 
 		glClearColor(0.2, 0.2, 0.2, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		GLfloat vx = sin(glfwGetTime() * viewSpd) * viewRad;
-		GLfloat vz = cos(glfwGetTime() * viewSpd) * viewRad;
-		view = glm::lookAt(glm::vec3(vx, 1.0, vz), //camPos
-	                             glm::vec3(0.0, 0.0, 0.0), //camTargetPos
-	                             glm::vec3(0.0, 1.0, 0.0)); //camUpVec
-		glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
+		// GLfloat vx = sin(glfwGetTime() * viewSpd) * viewRad;
+		// GLfloat vz = cos(glfwGetTime() * viewSpd) * viewRad;
+		// view = glm::lookAt(glm::vec3(vx, 1.0, vz), //camPos
+	    //                          glm::vec3(0.0, 0.0, 0.0), //camTargetPos
+	    //                          glm::vec3(0.0, 1.0, 0.0)); //camUpVec
+		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
 		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(0.0, 0.0, 10.0));
+
+		view = camera.GetViewMatrix();
 
 		shader.use();
 		shader.setMat4("model", model);
