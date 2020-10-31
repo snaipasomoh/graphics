@@ -79,6 +79,7 @@ void Mesh::setupMesh (){
 void Mesh::draw (Shader shader){
 	uint diffuseNr = 1;
 	uint specularNr = 1;
+	uint normalNr = 1;
 	
 	for (size_t i = 0; i < textures.size(); i++){
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -90,13 +91,16 @@ void Mesh::draw (Shader shader){
 		else if (name == "texture_specular"){
 			number = std::to_string(specularNr++);
 		}
-		shader.setFloat(("material." + name + number).c_str(), i);
+		else if (name == "texture_normal"){
+			number = std::to_string(normalNr++);
+		}
+		shader.setInt((name + number).c_str(), i);
+		// std::cout << name + number << std::endl;
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
-
-	glActiveTexture(GL_TEXTURE0);
 	
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
 }

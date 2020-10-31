@@ -24,6 +24,46 @@ GLfloat lastFrame = 0.0;
 GLfloat yaw = -90.0f;
 GLfloat pitch = 0.0f;
 
+void addNormals (GLfloat *vert, GLuint *ind, size_t n,
+                 GLfloat *res, size_t len = 6){
+	for (size_t i = 0, j = 0; i < n / 3; i++){
+		size_t vertAind = (ind[i*3] * len);
+		size_t vertBind = (ind[i*3 + 1] * len);
+		size_t vertCind = (ind[i*3 + 2] * len);
+		glm::vec3 a (vert[vertAind], vert[vertAind + 1], vert[vertAind + 2]);
+		glm::vec3 b (vert[vertBind], vert[vertBind + 1], vert[vertBind + 2]);
+		glm::vec3 c (vert[vertCind], vert[vertCind + 1], vert[vertCind + 2]);
+		glm::vec3 r (glm::normalize(glm::cross(a - b, c - b)));
+
+		for (size_t k = 0; k < len; k++){
+			res[j + k] = vert[vertAind + k];
+		}
+		for (size_t k = len; k < len + 3; k++){
+			res[j + k] = r[k - len];
+		}
+		j += len + 3;
+		for (size_t k = 0; k < len; k++){
+			res[j + k] = vert[vertBind + k];
+		}
+		for (size_t k = len; k < len + 3; k++){
+			res[j + k] = r[k - len];
+		}
+		j += len + 3;
+		for (size_t k = 0; k < len; k++){
+			res[j + k] = vert[vertCind + k];
+		}
+		for (size_t k = len; k < len + 3; k++){
+			res[j + k] = r[k - len];
+		}
+		j += len + 3;
+
+		// std::cout << a.x << " " << a.y << " " << a.z << " " << std::endl;
+		// std::cout << b.x << " " << b.y << " " << b.z << " " << std::endl;
+		// std::cout << c.x << " " << c.y << " " << c.z << " " << std::endl;
+		// std::cout << std::endl;
+	}
+}
+
 void key_callback (GLFWwindow *window, int key, int scancode, int action,
                                                                       int mode){
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
@@ -96,6 +136,10 @@ int main (int argc, char **argv){
 	Shader shader("shader.vert", "shader.frag");
 
 	glm::vec3 lightTarget(0.0, 0.0, 0.0);
+	glm::vec3 lightPos(0.0, 0.0, 10.0);
+	glm::vec3 lightColor(1.0, 1.0, 1.0);
+	glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
 	glm::mat4 model(1.0);
 	glm::mat4 view;/* = glm::lookAt(planeNorm * 40.0f, //camPos
@@ -108,6 +152,8 @@ int main (int argc, char **argv){
 	GLfloat viewSpd = 2.0;
 
 	Model obj(std::filesystem::absolute("octo.obj"));
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -128,12 +174,20 @@ int main (int argc, char **argv){
 		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
 		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(0.0, 0.0, 10.0));
 
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
+	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
+
 		view = camera.GetViewMatrix();
 
 		shader.use();
 		shader.setMat4("model", model);
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
+		shader.setVec3("light.direction", lightTarget - lightPos);
+		shader.setVec3("light.ambient", ambientColor);
+		shader.setVec3("light.diffuse", diffuseColor);
+		shader.setVec3("light.specular", 1.0, 1.0, 1.0);
+		shader.setVec3("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 		// shader.setVec3("lightDir", lightDir);
 		obj.draw(shader);
 

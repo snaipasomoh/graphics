@@ -307,7 +307,7 @@ int main (int argc, char **argv){
 
 		glm::mat4 projection(1.0);
 		projection = glm::perspective(glm::radians(camera.Zoom), (float)width/height, 0.1f, 100.0f);
-
+		std::cout << glm::radians(camera.Zoom) << std::endl;
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 		

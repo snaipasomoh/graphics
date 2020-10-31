@@ -32,7 +32,7 @@ unsigned int TextureFromFile(const char *path, const std::string &directory,
                              bool gamma = false){
 	std::string filename = std::string(path);
 	filename = directory + '/' + filename;
-	// std::cout << filename << std::endl;
+	std::cout << filename << std::endl;
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
@@ -143,6 +143,11 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 		std::vector<Texture> specularMaps = loadMaterialTextures(material,
 		                            aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+		
+		// bug in libassimp: normal map has type HEIGHT
+		std::vector<Texture> normalMaps = loadMaterialTextures(material,
+		                            aiTextureType_HEIGHT, "texture_normal");
+		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 	}
 	
 	return Mesh(vertices, indices, textures);
@@ -151,9 +156,9 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
                                 aiTextureType type, std::string typeName){
 	std::vector<Texture> textures;
-	// std::cout << "called" << std::endl;
+	std::cout << "called" << std::endl;
 	for (size_t i = 0; i < mat->GetTextureCount(type); i++){
-		// std::cout << "called for" << std::endl;
+		std::cout << "called for" << std::endl;
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		bool skip = false;
