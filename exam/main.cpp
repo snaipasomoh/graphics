@@ -96,7 +96,7 @@ int main (int argc, char **argv){
 	Shader shader("shader.vert", "shader.frag");
 
 	glm::vec3 lightTarget(0.0, 0.0, 0.0);
-	glm::vec3 lightPos(0.0, 0.0, 10.0);
+	glm::vec3 lightPos(0.0, 10.0, 0.0);
 	glm::vec3 lightColor(1.0, 1.0, 1.0);
 	glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
@@ -108,8 +108,8 @@ int main (int argc, char **argv){
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
 	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
 
-	GLfloat viewRad = 10.0;
-	GLfloat viewSpd = 2.0;
+	GLfloat lightRad = 10.0;
+	GLfloat lightSpd = 2.0;
 
 	Model obj(std::filesystem::absolute("octo.obj"));
 
@@ -126,8 +126,9 @@ int main (int argc, char **argv){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		// GLfloat vx = sin(glfwGetTime() * viewSpd) * viewRad;
-		// GLfloat vz = cos(glfwGetTime() * viewSpd) * viewRad;
+		GLfloat ly = sin(glfwGetTime() * lightSpd) * lightRad;
+		GLfloat lz = cos(glfwGetTime() * lightSpd) * lightRad;
+		lightPos = glm::vec3(0.0, ly, lz);
 		// view = glm::lookAt(glm::vec3(vx, 1.0, vz), //camPos
 	    //                          glm::vec3(0.0, 0.0, 0.0), //camTargetPos
 	    //                          glm::vec3(0.0, 1.0, 0.0)); //camUpVec
@@ -143,10 +144,13 @@ int main (int argc, char **argv){
 		shader.setMat4("model", model);
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
-		shader.setVec3("light.direction", lightTarget - lightPos);
+		shader.setVec3("light.position", lightPos);
 		shader.setVec3("light.ambient", ambientColor);
 		shader.setVec3("light.diffuse", diffuseColor);
 		shader.setVec3("light.specular", 1.0, 1.0, 1.0);
+		shader.setFloat("light.constant", 1.0);
+		shader.setFloat("light.linear", 0.022);
+		shader.setFloat("light.quadratic", 0.0019);
 		shader.setVec3("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
 		// shader.setVec3("lightDir", lightDir);
 		obj.draw(shader);
