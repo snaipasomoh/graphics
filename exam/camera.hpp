@@ -11,7 +11,9 @@ enum Camera_Movement {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP,
+	DOWN
 };
 
 
@@ -77,6 +79,10 @@ class Camera{
 			this->Position -= this->Right * velocity;
 		if (direction == RIGHT)
 			this->Position += this->Right * velocity;
+		if (direction == UP)
+			this->Position += this->Up * velocity;
+		if (direction == DOWN)
+			this->Position -= this->Up * velocity;
 	}
 
 

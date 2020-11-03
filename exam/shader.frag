@@ -21,6 +21,8 @@ uniform vec3 viewPos;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_normal1;
 uniform Light light;
+uniform float shininess;
+uniform vec3 matSpec;
 
 void main(){
 	vec3 ambient = light.ambient * vec3(texture(texture_diffuse1, TexCoords));
@@ -33,11 +35,10 @@ void main(){
 	float diff = max(dot(normal, lightDir), 0.0);
 	vec3 diffuse = light.diffuse * diff * vec3(texture(texture_diffuse1, TexCoords));
 
-	float shininess = 32;
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec3 specular = light.specular * spec * vec3(1.0);
+	vec3 specular = light.specular * spec * matSpec;
 
 	float distance = length(light.position - FragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance +

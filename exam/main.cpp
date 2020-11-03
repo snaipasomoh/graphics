@@ -11,6 +11,11 @@
 #include "model.hpp"
 #include "camera.hpp"
 
+// use only one at the same time
+#define OCTO
+// #define ICO
+// #define DODE
+
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
 
@@ -62,6 +67,10 @@ void do_movement (){
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if(keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if(keys[GLFW_KEY_LEFT_SHIFT])
+		camera.ProcessKeyboard(UP, deltaTime);
+	if(keys[GLFW_KEY_LEFT_CONTROL])
+		camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 int main (int argc, char **argv){
@@ -102,16 +111,36 @@ int main (int argc, char **argv){
 	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
 	glm::mat4 model(1.0);
-	glm::mat4 view;/* = glm::lookAt(planeNorm * 40.0f, //camPos
-	                             glm::vec3(0.0, 0.0, 0.0), //camTargetPos
-	                             glm::vec3(0.0, 1.0, 0.0)); //camUpVec*/
+	glm::mat4 view;
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
 	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
 
 	GLfloat lightRad = 10.0;
 	GLfloat lightSpd = 0.5;
 
-	Model obj(std::filesystem::absolute("octo_textured_gl_yz.obj"));
+	#ifdef OCTO
+
+	Model obj(std::filesystem::absolute("octo.obj"));
+	GLfloat shininess = 32;
+	glm::vec3 matSpecular(1.0);
+
+	#endif
+
+	#ifdef ICO
+
+	Model obj(std::filesystem::absolute("ico.obj"));
+	GLfloat shininess = 10;
+	glm::vec3 matSpecular(0.0);
+
+	#endif
+
+	#ifdef DODE
+
+	Model obj(std::filesystem::absolute("dode.obj"));
+	GLfloat shininess = 32;
+	glm::vec3 matSpecular(1.0);
+
+	#endif
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -129,11 +158,6 @@ int main (int argc, char **argv){
 		GLfloat ly = sin(glfwGetTime() * lightSpd) * lightRad;
 		GLfloat lz = cos(glfwGetTime() * lightSpd) * lightRad;
 		lightPos = glm::vec3(0.0, ly, lz);
-		// view = glm::lookAt(glm::vec3(vx, 1.0, vz), //camPos
-	    //                          glm::vec3(0.0, 0.0, 0.0), //camTargetPos
-	    //                          glm::vec3(0.0, 1.0, 0.0)); //camUpVec
-		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(vx, 0.0, vz));
-		// glm::vec3 lightDir = glm::normalize(lightTarget - glm::vec3(0.0, 0.0, 10.0));
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
 	                                float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
@@ -149,10 +173,11 @@ int main (int argc, char **argv){
 		shader.setVec3("light.diffuse", diffuseColor);
 		shader.setVec3("light.specular", 1.0, 1.0, 1.0);
 		shader.setFloat("light.constant", 1.0);
-		shader.setFloat("light.linear", 0.022);
-		shader.setFloat("light.quadratic", 0.0019);
+		shader.setFloat("light.linear", 0.01);
+		shader.setFloat("light.quadratic", 0.001);
+		shader.setFloat("shininess", shininess);
+		shader.setVec3("matSpec", matSpecular);
 		shader.setVec3("viewPos", camera.Position.x, camera.Position.y, camera.Position.z);
-		// shader.setVec3("lightDir", lightDir);
 		obj.draw(shader);
 
 		glfwSwapBuffers(window);
