@@ -24,46 +24,6 @@ GLfloat lastFrame = 0.0;
 GLfloat yaw = -90.0f;
 GLfloat pitch = 0.0f;
 
-void addNormals (GLfloat *vert, GLuint *ind, size_t n,
-                 GLfloat *res, size_t len = 6){
-	for (size_t i = 0, j = 0; i < n / 3; i++){
-		size_t vertAind = (ind[i*3] * len);
-		size_t vertBind = (ind[i*3 + 1] * len);
-		size_t vertCind = (ind[i*3 + 2] * len);
-		glm::vec3 a (vert[vertAind], vert[vertAind + 1], vert[vertAind + 2]);
-		glm::vec3 b (vert[vertBind], vert[vertBind + 1], vert[vertBind + 2]);
-		glm::vec3 c (vert[vertCind], vert[vertCind + 1], vert[vertCind + 2]);
-		glm::vec3 r (glm::normalize(glm::cross(a - b, c - b)));
-
-		for (size_t k = 0; k < len; k++){
-			res[j + k] = vert[vertAind + k];
-		}
-		for (size_t k = len; k < len + 3; k++){
-			res[j + k] = r[k - len];
-		}
-		j += len + 3;
-		for (size_t k = 0; k < len; k++){
-			res[j + k] = vert[vertBind + k];
-		}
-		for (size_t k = len; k < len + 3; k++){
-			res[j + k] = r[k - len];
-		}
-		j += len + 3;
-		for (size_t k = 0; k < len; k++){
-			res[j + k] = vert[vertCind + k];
-		}
-		for (size_t k = len; k < len + 3; k++){
-			res[j + k] = r[k - len];
-		}
-		j += len + 3;
-
-		// std::cout << a.x << " " << a.y << " " << a.z << " " << std::endl;
-		// std::cout << b.x << " " << b.y << " " << b.z << " " << std::endl;
-		// std::cout << c.x << " " << c.y << " " << c.z << " " << std::endl;
-		// std::cout << std::endl;
-	}
-}
-
 void key_callback (GLFWwindow *window, int key, int scancode, int action,
                                                                       int mode){
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){

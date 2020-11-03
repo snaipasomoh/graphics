@@ -4,8 +4,8 @@
 #include <SOIL/SOIL.h>
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <stb/stb_image.h>
-// #include <SOIL/stb_image_aug.h>
+// #include <stb/stb_image.h>
+#include <SOIL/stb_image_aug.h>
 
 class Model{
 	public:
@@ -32,7 +32,7 @@ unsigned int TextureFromFile(const char *path, const std::string &directory,
                              bool gamma = false){
 	std::string filename = std::string(path);
 	filename = directory + '/' + filename;
-	std::cout << filename << std::endl;
+	// std::cout << filename << std::endl;
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
@@ -79,7 +79,8 @@ void Model::draw (Shader shader){
 
 void Model::loadModel (std::string path){
 	Assimp::Importer importer;
-	uint loadFlags = aiProcess_Triangulate | aiProcess_FlipUVs;
+	uint loadFlags = aiProcess_Triangulate | aiProcess_FlipUVs |
+	                 aiProcess_CalcTangentSpace;
 	aiScene const *scene = importer.ReadFile(path, loadFlags);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
@@ -114,7 +115,11 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 
 		vertex.Normal.x = mesh->mNormals[i].x;
 		vertex.Normal.y = mesh->mNormals[i].y;
-		vertex.Normal.z = mesh->mNormals[i].z; 
+		vertex.Normal.z = mesh->mNormals[i].z;
+
+		vertex.Tangent.x = mesh->mTangents[i].x;
+		vertex.Tangent.y = mesh->mTangents[i].y;
+		vertex.Tangent.z = mesh->mTangents[i].z;
 
 		if (mesh->mTextureCoords[0]){
 			vertex.TexCoords.x = mesh->mTextureCoords[0][i].x;
@@ -156,9 +161,9 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
                                 aiTextureType type, std::string typeName){
 	std::vector<Texture> textures;
-	std::cout << "called" << std::endl;
+	// std::cout << "called" << std::endl;
 	for (size_t i = 0; i < mat->GetTextureCount(type); i++){
-		std::cout << "called for" << std::endl;
+		// std::cout << "called for" << std::endl;
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		bool skip = false;
