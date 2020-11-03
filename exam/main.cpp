@@ -12,9 +12,9 @@
 #include "camera.hpp"
 
 // use only one at the same time
-#define OCTO
+// #define OCTO
 // #define ICO
-// #define DODE
+#define DODE
 
 const int WIDTH = 1920;
 const int HEIGHT = 1080;
@@ -102,7 +102,6 @@ int main (int argc, char **argv){
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	Shader shader("shader.vert", "shader.frag");
 
 	glm::vec3 lightTarget(0.0, 0.0, 0.0);
 	glm::vec3 lightPos(0.0, 10.0, 0.0);
@@ -121,6 +120,7 @@ int main (int argc, char **argv){
 	#ifdef OCTO
 
 	Model obj(std::filesystem::absolute("octo.obj"));
+	Shader shader("shader.vert", "shader.frag");
 	GLfloat shininess = 32;
 	glm::vec3 matSpecular(1.0);
 
@@ -129,6 +129,7 @@ int main (int argc, char **argv){
 	#ifdef ICO
 
 	Model obj(std::filesystem::absolute("ico.obj"));
+	Shader shader("shader.vert", "shader.frag");
 	GLfloat shininess = 10;
 	glm::vec3 matSpecular(0.0);
 
@@ -137,8 +138,9 @@ int main (int argc, char **argv){
 	#ifdef DODE
 
 	Model obj(std::filesystem::absolute("dode.obj"));
-	GLfloat shininess = 32;
-	glm::vec3 matSpecular(1.0);
+	Shader shader("shader.vert", "shaderE.frag");
+	GLfloat shininess = 51.2;
+	glm::vec3 matSpecular(0.628281, 0.555802, 0.366065);
 
 	#endif
 

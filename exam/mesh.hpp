@@ -80,6 +80,7 @@ void Mesh::draw (Shader shader){
 	uint diffuseNr = 1;
 	uint specularNr = 1;
 	uint normalNr = 1;
+	uint emissiveNr = 1;
 	
 	for (size_t i = 0; i < textures.size(); i++){
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -93,6 +94,9 @@ void Mesh::draw (Shader shader){
 		}
 		else if (name == "texture_normal"){
 			number = std::to_string(normalNr++);
+		}
+		else if (name == "texture_emissive"){
+			number = std::to_string(emissiveNr++);
 		}
 		shader.setInt((name + number).c_str(), i);
 		// std::cout << name + number << std::endl;

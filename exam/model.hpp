@@ -148,6 +148,9 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 		std::vector<Texture> normalMaps = loadMaterialTextures(material,
 		                            aiTextureType_HEIGHT, "texture_normal");
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+		std::vector<Texture> emissiveMaps = loadMaterialTextures(material,
+		                            aiTextureType_EMISSIVE, "texture_emissive");
+		textures.insert(textures.end(), emissiveMaps.begin(), emissiveMaps.end());
 	}
 	
 	return Mesh(vertices, indices, textures);
@@ -156,7 +159,7 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
                                 aiTextureType type, std::string typeName){
 	std::vector<Texture> textures;
-	// std::cout << "called" << std::endl;
+	// std::cout << "called " << typeName << std::endl;
 	for (size_t i = 0; i < mat->GetTextureCount(type); i++){
 		// std::cout << "called for" << std::endl;
 		aiString str;
