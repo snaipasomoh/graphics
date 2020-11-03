@@ -79,8 +79,7 @@ void Model::draw (Shader shader){
 
 void Model::loadModel (std::string path){
 	Assimp::Importer importer;
-	uint loadFlags = aiProcess_Triangulate | aiProcess_FlipUVs |
-	                 aiProcess_CalcTangentSpace;
+	uint loadFlags = aiProcess_Triangulate | aiProcess_FlipUVs;
 	aiScene const *scene = importer.ReadFile(path, loadFlags);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
@@ -116,10 +115,6 @@ Mesh Model::processMesh (aiMesh *mesh, aiScene const *scene){
 		vertex.Normal.x = mesh->mNormals[i].x;
 		vertex.Normal.y = mesh->mNormals[i].y;
 		vertex.Normal.z = mesh->mNormals[i].z;
-
-		vertex.Tangent.x = mesh->mTangents[i].x;
-		vertex.Tangent.y = mesh->mTangents[i].y;
-		vertex.Tangent.z = mesh->mTangents[i].z;
 
 		if (mesh->mTextureCoords[0]){
 			vertex.TexCoords.x = mesh->mTextureCoords[0][i].x;

@@ -93,7 +93,7 @@ int main (int argc, char **argv){
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	Shader shader("shader.vert", "shaderG.frag");
+	Shader shader("shader.vert", "shader.frag");
 
 	glm::vec3 lightTarget(0.0, 0.0, 0.0);
 	glm::vec3 lightPos(0.0, 10.0, 0.0);
@@ -111,7 +111,7 @@ int main (int argc, char **argv){
 	GLfloat lightRad = 10.0;
 	GLfloat lightSpd = 0.5;
 
-	Model obj(std::filesystem::absolute("octo.obj"));
+	Model obj(std::filesystem::absolute("octo_textured_gl_yz.obj"));
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -126,9 +126,9 @@ int main (int argc, char **argv){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		// GLfloat ly = sin(glfwGetTime() * lightSpd) * lightRad;
-		// GLfloat lz = cos(glfwGetTime() * lightSpd) * lightRad;
-		// lightPos = glm::vec3(0.0, ly, lz);
+		GLfloat ly = sin(glfwGetTime() * lightSpd) * lightRad;
+		GLfloat lz = cos(glfwGetTime() * lightSpd) * lightRad;
+		lightPos = glm::vec3(0.0, ly, lz);
 		// view = glm::lookAt(glm::vec3(vx, 1.0, vz), //camPos
 	    //                          glm::vec3(0.0, 0.0, 0.0), //camTargetPos
 	    //                          glm::vec3(0.0, 1.0, 0.0)); //camUpVec

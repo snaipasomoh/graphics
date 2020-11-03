@@ -16,7 +16,6 @@ out vec4 FragColor;
 
 in vec2 TexCoords;
 in vec3 FragPos;
-in mat3 TBN;
 
 uniform vec3 viewPos;
 uniform sampler2D texture_diffuse1;
@@ -28,7 +27,7 @@ void main(){
 
 	vec3 normal = vec3(texture(texture_normal1, TexCoords));
 	normal = normal * 2.0 - 1.0;
-	normal = normalize(TBN * normal);
+	normal = normalize(normal);
 
 	vec3 lightDir = normalize(light.position - FragPos);
 	float diff = max(dot(normal, lightDir), 0.0);
