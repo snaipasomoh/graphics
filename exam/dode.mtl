@@ -12,4 +12,4 @@ d 1.000000
 illum 2
 map_Bump dode_norm.png
 map_Kd dode_diff.png
-map_emissive dode_emit.png
+map_Ke dode_emit.png
