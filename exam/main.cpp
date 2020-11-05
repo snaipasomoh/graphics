@@ -120,7 +120,6 @@ int main (int argc, char **argv){
 	#ifdef OCTO
 
 	Model obj(std::filesystem::absolute("octo.obj"));
-	Shader shader("shader.vert", "shader.frag");
 	GLfloat shininess = 32;
 	glm::vec3 matSpecular(1.0);
 
@@ -129,7 +128,6 @@ int main (int argc, char **argv){
 	#ifdef ICO
 
 	Model obj(std::filesystem::absolute("ico.obj"));
-	Shader shader("shader.vert", "shader.frag");
 	GLfloat shininess = 10;
 	glm::vec3 matSpecular(0.0);
 
@@ -138,11 +136,12 @@ int main (int argc, char **argv){
 	#ifdef DODE
 
 	Model obj(std::filesystem::absolute("dode.obj"));
-	Shader shader("shader.vert", "shaderE.frag");
 	GLfloat shininess = 51.2;
 	glm::vec3 matSpecular(0.628281, 0.555802, 0.366065);
 
 	#endif
+
+	Shader shader("shader.vert", "shader.frag");
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

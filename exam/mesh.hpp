@@ -99,6 +99,12 @@ void Mesh::draw (Shader shader){
 			number = std::to_string(emissiveNr++);
 		}
 		shader.setInt((name + number).c_str(), i);
+		if (emissiveNr > 1){
+			shader.setBool("emiss_tex", 1);
+		}
+		else{
+			shader.setBool("emiss_tex", 0);
+		}
 		// std::cout << name + number << std::endl;
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}

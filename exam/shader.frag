@@ -20,6 +20,8 @@ in vec3 FragPos;
 uniform vec3 viewPos;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_normal1;
+uniform sampler2D texture_emissive1;
+uniform bool emiss_tex;
 uniform Light light;
 uniform float shininess;
 uniform vec3 matSpec;
@@ -44,10 +46,15 @@ void main(){
 	float attenuation = 1.0 / (light.constant + light.linear * distance +
 	                    light.quadratic * distance * distance);
 
+	vec3 emissive = vec3(0.0);
+	if (emiss_tex){
+		emissive = vec3(texture(texture_emissive1, TexCoords));
+	}
+
 	ambient *= attenuation;
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	FragColor = vec4(ambient + diffuse + specular, 1.0);
-	// FragColor = vec4(diffuse, 1.0);
+
+	FragColor = vec4(ambient + diffuse + specular + emissive, 1.0);
 }
